@@ -25,6 +25,9 @@ public class Trip {
     @Column(name = "driver_id")
     private Long driverId;
 
+    @Column(name = "vehicle_id")
+    private Long vehicleId;
+
     @Column(nullable = false)
     private String origin;
 
@@ -36,6 +39,9 @@ public class Trip {
     private TripStatus status = TripStatus.PENDING;
 
     private Double price;
+
+    @Column(name = "distance_km")
+    private Double distanceKm;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

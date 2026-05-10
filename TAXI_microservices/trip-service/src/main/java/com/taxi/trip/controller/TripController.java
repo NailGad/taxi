@@ -48,7 +48,7 @@ public class TripController {
             @Valid @RequestBody UpdateTripStatusRequest request,
             @RequestHeader(value = "X-Driver-Id", required = false) Long driverId) {
         log.info("PATCH /trips/{}/status - Updating status to: {}", id, request.getStatus());
-        TripResponseDto trip = tripService.updateTripStatus(id, request.getStatus(), driverId);
+        TripResponseDto trip = tripService.updateTripStatus(id, request.getStatus(), driverId, request.getDistanceKm());
         return ResponseEntity.ok(trip);
     }
 }

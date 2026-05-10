@@ -23,7 +23,7 @@ public interface TripRepository extends JpaRepository<Trip, Long> {
     @Query("UPDATE Trip t SET t.status = :status WHERE t.id = :id")
     void updateStatus(@Param("id") Long id, @Param("status") TripStatus status);
 
-    @Modifying
-    @Query("UPDATE Trip t SET t.driverId = :driverId, t.status = 'ACCEPTED' WHERE t.id = :id AND t.status = 'PENDING'")
-    int assignDriver(@Param("id") Long id, @Param("driverId") Long driverId);
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("UPDATE Trip t SET t.driverId = :driverId, t.vehicleId = :vehicleId, t.status = 'ACCEPTED' WHERE t.id = :id AND t.status = 'PENDING'")
+    int assignDriver(@Param("id") Long id, @Param("driverId") Long driverId, @Param("vehicleId") Long vehicleId);
 }

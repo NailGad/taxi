@@ -13,10 +13,12 @@ public class TripResponseDto {
     private Long id;
     private Long passengerId;
     private Long driverId;
+    private Long vehicleId;
     private String origin;
     private String destination;
     private TripStatus status;
     private Double price;
+    private Double distanceKm;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

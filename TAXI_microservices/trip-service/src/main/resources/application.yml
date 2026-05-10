@@ -31,6 +31,9 @@ user-service:
 notification-service:
   url: http://localhost:8083
 
+vehicle-service:
+  url: http://localhost:8084
+
 logging:
   level:
     com.taxi: DEBUG

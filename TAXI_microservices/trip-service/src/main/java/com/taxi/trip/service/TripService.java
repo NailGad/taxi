@@ -1,6 +1,7 @@
 package com.taxi.trip.service;
 
 import com.taxi.trip.client.UserServiceClient;
+import com.taxi.trip.client.VehicleServiceClient;
 import com.taxi.trip.dto.CreateTripRequest;
 import com.taxi.trip.dto.DriverDto;
 import com.taxi.trip.dto.TripResponseDto;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 public class TripService {
     private final TripRepository tripRepository;
     private final UserServiceClient userServiceClient;
+    private final VehicleServiceClient vehicleServiceClient;
 
     @Transactional
     public TripResponseDto createTrip(CreateTripRequest request) {
@@ -43,7 +45,8 @@ public class TripService {
 
         assignDriverToTrip(savedTrip);
 
-        return convertToDto(savedTrip);
+        Trip refreshed = tripRepository.findById(savedTrip.getId()).orElse(savedTrip);
+        return convertToDto(refreshed);
     }
 
     @Transactional
@@ -56,7 +59,9 @@ public class TripService {
             DriverDto driver = availableDriver.get();
             log.info("Found driver {} for trip {}", driver.getId(), trip.getId());
 
-            int updated = tripRepository.assignDriver(trip.getId(), driver.getId());
+            Long vehicleId = vehicleServiceClient.findTodayVehicleId(driver.getId()).orElse(null);
+
+            int updated = tripRepository.assignDriver(trip.getId(), driver.getId(), vehicleId);
 
             if (updated > 0) {
                 // Обновляем статус водителя на BUSY
@@ -86,7 +91,7 @@ public class TripService {
     }
 
     @Transactional
-    public TripResponseDto updateTripStatus(Long id, TripStatus newStatus, Long driverId) {
+    public TripResponseDto updateTripStatus(Long id, TripStatus newStatus, Long driverId, Double distanceKm) {
         log.info("Updating trip {} status to: {} by driver {}", id, newStatus, driverId);
 
         Trip trip = tripRepository.findById(id)
@@ -115,11 +120,19 @@ public class TripService {
                 if (oldStatus != TripStatus.IN_PROGRESS) {
                     throw new RuntimeException("Cannot complete trip that is not in progress");
                 }
+                if (distanceKm == null || distanceKm <= 0) {
+                    throw new RuntimeException("distanceKm is required and must be positive when completing a trip");
+                }
                 if (trip.getDriverId() != null) {
                     userServiceClient.updateDriverStatus(trip.getDriverId(), "ONLINE");
                     log.info("Driver {} released back to ONLINE", trip.getDriverId());
                 }
-                trip.setPrice(calculatePrice(trip.getOrigin(), trip.getDestination()));
+                double price = vehicleServiceClient.estimatePrice(
+                        trip.getDriverId(),
+                        trip.getVehicleId(),
+                        distanceKm);
+                trip.setDistanceKm(distanceKm);
+                trip.setPrice(price);
                 log.info("Trip {} completed with price: {}", id, trip.getPrice());
                 break;
 
@@ -139,19 +152,17 @@ public class TripService {
         return convertToDto(updated);
     }
 
-    private Double calculatePrice(String origin, String destination) {
-        return 50.0 + Math.random() * 100;
-    }
-
     private TripResponseDto convertToDto(Trip trip) {
         return new TripResponseDto(
                 trip.getId(),
                 trip.getPassengerId(),
                 trip.getDriverId(),
+                trip.getVehicleId(),
                 trip.getOrigin(),
                 trip.getDestination(),
                 trip.getStatus(),
                 trip.getPrice(),
+                trip.getDistanceKm(),
                 trip.getCreatedAt(),
                 trip.getUpdatedAt()
         );

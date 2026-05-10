@@ -12,4 +12,6 @@ import lombok.AllArgsConstructor;
 public class UpdateTripStatusRequest {
     @NotNull(message = "Status is required")
     private TripStatus status;
+
+    private Double distanceKm;
 }
