@@ -9,9 +9,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.Map
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/notifications")
@@ -42,14 +42,5 @@ public class NotificationController {
         log.debug("GET /notifications/stats - Fetching queue statistics");
         Map<String, Long> stats = notificationService.getQueueStats();
         return ResponseEntity.ok(stats);
-    }
-
-    public Map<String, Long> getQueueStats() {
-        Map<String, Long> stats = new HashMap<>();
-        stats.put("PENDING", notificationRepository.countByStatus(NotificationStatus.PENDING));
-        stats.put("PROCESSING", notificationRepository.countByStatus(NotificationStatus.PROCESSING));
-        stats.put("SENT", notificationRepository.countByStatus(NotificationStatus.SENT));
-        stats.put("FAILED", notificationRepository.countByStatus(NotificationStatus.FAILED));
-        return stats;
     }
 }

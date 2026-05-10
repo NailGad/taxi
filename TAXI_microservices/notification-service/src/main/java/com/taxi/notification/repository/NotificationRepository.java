@@ -33,7 +33,7 @@ public interface NotificationRepository extends JpaRepository<NotificationTask, 
     @Query(value = "SELECT * FROM notification_tasks " +
             "WHERE status = 'PENDING' AND attempts < :maxRetries " +
             "ORDER BY created_at ASC " +
-            "LIMIT 1 FOR UPDATE SKIP LOCKED", nativeQuery = true)
+            "LIMIT 1", nativeQuery = true)
     Optional<NotificationTask> findNextPendingTask(@Param("maxRetries") int maxRetries);
 
     long countByStatus(NotificationStatus status);

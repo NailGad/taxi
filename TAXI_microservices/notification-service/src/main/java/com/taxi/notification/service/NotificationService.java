@@ -12,11 +12,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -52,6 +51,15 @@ public class NotificationService {
         return tasks.stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
+    }
+
+    public Map<String, Long> getQueueStats() {
+        Map<String, Long> stats = new HashMap<>();
+        stats.put("PENDING", notificationRepository.countByStatus(NotificationStatus.PENDING));
+        stats.put("PROCESSING", notificationRepository.countByStatus(NotificationStatus.PROCESSING));
+        stats.put("SENT", notificationRepository.countByStatus(NotificationStatus.SENT));
+        stats.put("FAILED", notificationRepository.countByStatus(NotificationStatus.FAILED));
+        return stats;
     }
 
     @Transactional
