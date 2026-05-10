@@ -17,6 +17,7 @@ services:
       - "8081:8081"
     environment:
       SPRING_PROFILES_ACTIVE: docker
+      JWT_SECRET: taxi-jwt-compose-shared-secret-min-32-chars-ok!!
     depends_on:
       redis:
         condition: service_healthy
@@ -34,6 +35,7 @@ services:
       - "8084:8084"
     environment:
       SPRING_PROFILES_ACTIVE: docker
+      JWT_SECRET: taxi-jwt-compose-shared-secret-min-32-chars-ok!!
     depends_on:
       user-service:
         condition: service_healthy
@@ -44,6 +46,7 @@ services:
       - "8082:8082"
     environment:
       SPRING_PROFILES_ACTIVE: docker
+      JWT_SECRET: taxi-jwt-compose-shared-secret-min-32-chars-ok!!
     depends_on:
       user-service:
         condition: service_healthy
@@ -58,6 +61,7 @@ services:
       - "8085:8085"
     environment:
       SPRING_PROFILES_ACTIVE: docker
+      JWT_SECRET: taxi-jwt-compose-shared-secret-min-32-chars-ok!!
     depends_on:
       trip-service:
         condition: service_healthy
@@ -68,6 +72,7 @@ services:
       - "8086:8086"
     environment:
       SPRING_PROFILES_ACTIVE: docker
+      JWT_SECRET: taxi-jwt-compose-shared-secret-min-32-chars-ok!!
     depends_on:
       user-service:
         condition: service_healthy

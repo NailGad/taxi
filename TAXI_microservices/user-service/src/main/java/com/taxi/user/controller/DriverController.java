@@ -9,6 +9,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,13 +30,6 @@ public class DriverController {
         log.info("POST /drivers - Registering driver: {}", driverDto.getEmail());
         DriverDto created = driverService.registerDriver(driverDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<DriverDto> getDriver(@PathVariable Long id) {
-        log.info("GET /drivers/{} - Fetching driver", id);
-        DriverDto driver = driverService.getDriver(id);
-        return ResponseEntity.ok(driver);
     }
 
     @PatchMapping("/{id}/status")
@@ -66,5 +63,18 @@ public class DriverController {
         log.debug("GET /drivers/{}/exists - Checking if driver exists", id);
         boolean exists = driverService.existsDriver(id);
         return ResponseEntity.ok(exists);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<DriverDto> getDriver(@PathVariable Long id) {
+        log.info("GET /drivers/{} - Fetching driver", id);
+        Authentication a = SecurityContextHolder.getContext().getAuthentication();
+        if (a == null
+                || !a.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_DRIVER"))
+                || !a.getName().equals(String.valueOf(id))) {
+            throw new AccessDeniedException("Driver profile access denied");
+        }
+        DriverDto driver = driverService.getDriver(id);
+        return ResponseEntity.ok(driver);
     }
 }

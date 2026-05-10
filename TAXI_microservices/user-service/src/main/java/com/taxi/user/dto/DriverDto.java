@@ -1,14 +1,13 @@
 package com.taxi.user.dto;
 
-import lombok.Data;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.taxi.user.model.DriverStatus;
 import jakarta.validation.constraints.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class DriverDto {
     private Long id;
 
@@ -28,4 +27,18 @@ public class DriverDto {
     private String licenseNumber;
 
     private DriverStatus status;
+
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @NotBlank(message = "Password is required")
+    @Size(min = 6, max = 72, message = "Password must be 6-72 characters")
+    private String password;
+
+    public DriverDto(Long id, String name, String email, String phone, String licenseNumber, DriverStatus status) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.phone = phone;
+        this.licenseNumber = licenseNumber;
+        this.status = status;
+    }
 }

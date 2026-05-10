@@ -34,6 +34,10 @@ notification-service:
 vehicle-service:
   url: http://localhost:8084
 
+jwt:
+  secret: ${JWT_SECRET:taxi-jwt-dev-secret-key-at-least-32-bytes!!}
+  expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+
 logging:
   level:
     com.taxi: DEBUG

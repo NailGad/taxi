@@ -20,6 +20,9 @@ server:
 trip-service:
   url: http://localhost:8082
 
+jwt:
+  secret: ${JWT_SECRET:taxi-jwt-dev-secret-key-at-least-32-bytes!!}
+
 logging:
   level:
     com.taxi: DEBUG

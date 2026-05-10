@@ -68,9 +68,11 @@ public class FavoritePlaceBusinessService {
     }
 
     @Transactional
-    public void delete(Long id) {
-        if (!favoritePlaceRepository.existsById(id)) {
-            throw new RuntimeException("Favorite place not found: " + id);
+    public void delete(Long id, UserKind role, Long userId) {
+        FavoritePlace fp = favoritePlaceRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Favorite place not found: " + id));
+        if (!fp.getUserKind().equals(role) || !fp.getUserId().equals(userId)) {
+            throw new RuntimeException("Ownership mismatch for favorite place");
         }
         favoritePlaceRepository.deleteById(id);
     }

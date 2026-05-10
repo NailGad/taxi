@@ -8,8 +8,13 @@ import com.taxi.rating.service.RatingBusinessService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import com.taxi.rating.model.TripParticipantRole;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,8 +29,22 @@ public class RatingController {
     public ResponseEntity<RatingResponseDto> rateTrip(
             @PathVariable Long tripId,
             @Valid @RequestBody CreateRatingRequest request) {
+        assertRater(request);
         RatingResponseDto dto = ratingBusinessService.rateTrip(tripId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
+    }
+
+    private void assertRater(CreateRatingRequest request) {
+        Authentication a = SecurityContextHolder.getContext().getAuthentication();
+        String expected = request.getRaterRole() == TripParticipantRole.PASSENGER
+                ? "ROLE_PASSENGER"
+                : "ROLE_DRIVER";
+        if (a == null || !a.getAuthorities().contains(new SimpleGrantedAuthority(expected))) {
+            throw new AccessDeniedException("JWT role does not match raterRole");
+        }
+        if (!a.getName().equals(String.valueOf(request.getRaterId()))) {
+            throw new AccessDeniedException("JWT subject does not match raterId");
+        }
     }
 
     @GetMapping("/ratings/driver/{driverId}")

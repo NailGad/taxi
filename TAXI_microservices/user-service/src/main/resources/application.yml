@@ -34,6 +34,10 @@ taxi:
   cache:
     available-drivers-ttl-seconds: 30
 
+jwt:
+  secret: ${JWT_SECRET:taxi-jwt-dev-secret-key-at-least-32-bytes!!}
+  expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+
 user-service:
   url: http://localhost:8081
 

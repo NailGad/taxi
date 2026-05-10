@@ -10,6 +10,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,6 +27,10 @@ public class TripController {
 
     @PostMapping
     public ResponseEntity<TripResponseDto> createTrip(@Valid @RequestBody CreateTripRequest request) {
+        long pid = requirePassengerId();
+        if (!request.getPassengerId().equals(pid)) {
+            throw new AccessDeniedException("Token does not match passengerId");
+        }
         log.info("POST /trips - Creating trip for passenger: {}", request.getPassengerId());
         TripResponseDto trip = tripService.createTrip(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(trip);
@@ -37,6 +45,10 @@ public class TripController {
 
     @GetMapping
     public ResponseEntity<List<TripResponseDto>> getTrips(@RequestParam(name = "passenger_id") Long passengerId) {
+        long pid = requirePassengerId();
+        if (!passengerId.equals(pid)) {
+            throw new AccessDeniedException("Token does not match passenger_id");
+        }
         log.info("GET /trips?passenger_id={} - Fetching passenger trip history", passengerId);
         List<TripResponseDto> trips = tripService.getTripsByPassenger(passengerId);
         return ResponseEntity.ok(trips);
@@ -47,8 +59,28 @@ public class TripController {
             @PathVariable Long id,
             @Valid @RequestBody UpdateTripStatusRequest request,
             @RequestHeader(value = "X-Driver-Id", required = false) Long driverId) {
+        long tokenDriverId = requireDriverId();
+        if (driverId != null && !driverId.equals(tokenDriverId)) {
+            throw new AccessDeniedException("X-Driver-Id does not match token");
+        }
         log.info("PATCH /trips/{}/status - Updating status to: {}", id, request.getStatus());
-        TripResponseDto trip = tripService.updateTripStatus(id, request.getStatus(), driverId, request.getDistanceKm());
+        TripResponseDto trip = tripService.updateTripStatus(id, request.getStatus(), tokenDriverId, request.getDistanceKm());
         return ResponseEntity.ok(trip);
+    }
+
+    private long requirePassengerId() {
+        Authentication a = SecurityContextHolder.getContext().getAuthentication();
+        if (a == null || !a.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_PASSENGER"))) {
+            throw new AccessDeniedException("Passenger JWT required");
+        }
+        return Long.parseLong(a.getName());
+    }
+
+    private long requireDriverId() {
+        Authentication a = SecurityContextHolder.getContext().getAuthentication();
+        if (a == null || !a.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_DRIVER"))) {
+            throw new AccessDeniedException("Driver JWT required");
+        }
+        return Long.parseLong(a.getName());
     }
 }

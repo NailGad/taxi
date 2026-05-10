@@ -5,6 +5,7 @@ import com.taxi.user.model.Passenger;
 import com.taxi.user.repository.PassengerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,19 +14,22 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class PassengerService {
     private final PassengerRepository passengerRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public PassengerDto registerPassenger(PassengerDto passengerDto) {
-        log.info("Registering new passenger with email: {}", passengerDto.getEmail());
+        String emailNorm = passengerDto.getEmail().trim().toLowerCase();
+        log.info("Registering new passenger with email: {}", emailNorm);
 
-        if (passengerRepository.existsByEmail(passengerDto.getEmail())) {
-            throw new RuntimeException("Passenger with email " + passengerDto.getEmail() + " already exists");
+        if (passengerRepository.existsByEmail(emailNorm)) {
+            throw new RuntimeException("Passenger with email " + emailNorm + " already exists");
         }
 
         Passenger passenger = new Passenger();
         passenger.setName(passengerDto.getName());
-        passenger.setEmail(passengerDto.getEmail());
+        passenger.setEmail(emailNorm);
         passenger.setPhone(passengerDto.getPhone());
+        passenger.setPasswordHash(passwordEncoder.encode(passengerDto.getPassword()));
 
         Passenger saved = passengerRepository.save(passenger);
         log.info("Passenger registered successfully with id: {}", saved.getId());

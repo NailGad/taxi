@@ -1,5 +1,6 @@
 package com.taxi.user.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -33,6 +34,10 @@ public class Driver {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private DriverStatus status = DriverStatus.OFFLINE;
+
+    @Column(name = "password_hash", nullable = false)
+    @JsonIgnore
+    private String passwordHash;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

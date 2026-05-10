@@ -8,6 +8,7 @@ import com.taxi.user.repository.DriverRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,14 +21,16 @@ import java.util.Optional;
 public class DriverService {
     private final DriverRepository driverRepository;
     private final AvailableDriversCacheLoader availableDriversCacheLoader;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     @CacheEvict(cacheNames = RedisCacheConfig.AVAILABLE_DRIVERS_CACHE, allEntries = true)
     public DriverDto registerDriver(DriverDto driverDto) {
-        log.info("Registering new driver with email: {}", driverDto.getEmail());
+        String emailNorm = driverDto.getEmail().trim().toLowerCase();
+        log.info("Registering new driver with email: {}", emailNorm);
 
-        if (driverRepository.existsByEmail(driverDto.getEmail())) {
-            throw new RuntimeException("Driver with email " + driverDto.getEmail() + " already exists");
+        if (driverRepository.existsByEmail(emailNorm)) {
+            throw new RuntimeException("Driver with email " + emailNorm + " already exists");
         }
 
         if (driverRepository.existsByLicenseNumber(driverDto.getLicenseNumber())) {
@@ -36,10 +39,11 @@ public class DriverService {
 
         Driver driver = new Driver();
         driver.setName(driverDto.getName());
-        driver.setEmail(driverDto.getEmail());
+        driver.setEmail(emailNorm);
         driver.setPhone(driverDto.getPhone());
         driver.setLicenseNumber(driverDto.getLicenseNumber());
-        driver.setStatus(DriverStatus.OFFLINE); // Initially offline
+        driver.setStatus(DriverStatus.OFFLINE);
+        driver.setPasswordHash(passwordEncoder.encode(driverDto.getPassword()));
 
         Driver saved = driverRepository.save(driver);
         log.info("Driver registered successfully with id: {}", saved.getId());

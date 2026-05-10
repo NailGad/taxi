@@ -53,6 +53,12 @@ public class VehicleBusinessService {
         return vehicleRepository.findByDriverIdOrderByIdAsc(driverId).stream().map(this::map).toList();
     }
 
+    public VehicleResponseDto findById(Long id) {
+        return vehicleRepository.findById(id)
+                .map(this::map)
+                .orElseThrow(() -> new RuntimeException("Vehicle not found: " + id));
+    }
+
     @Transactional
     public VehicleResponseDto update(Long id, VehicleRequestDto dto) {
         Vehicle v = vehicleRepository.findById(id)

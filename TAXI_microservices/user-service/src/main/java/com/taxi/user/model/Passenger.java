@@ -1,5 +1,6 @@
 package com.taxi.user.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,6 +27,10 @@ public class Passenger {
 
     @Column(nullable = false)
     private String phone;
+
+    @Column(name = "password_hash", nullable = false)
+    @JsonIgnore
+    private String passwordHash;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
