@@ -12,6 +12,8 @@ com\taxi\trip\service\TripService$1.class
 com\taxi\trip\controller\TripController.class
 com\taxi\trip\service\TripService.class
 com\taxi\trip\dto\TripResponseDto.class
+com\taxi\trip\dto\DailyTripStatsResponse.class
+com\taxi\trip\service\TripStatsService.class
 com\taxi\trip\config\SecurityConfig.class
 com\taxi\trip\client\UserServiceClient.class
 com\taxi\trip\client\VehicleServiceClient.class

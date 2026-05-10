@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,4 +27,16 @@ public interface TripRepository extends JpaRepository<Trip, Long> {
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("UPDATE Trip t SET t.driverId = :driverId, t.vehicleId = :vehicleId, t.status = 'ACCEPTED' WHERE t.id = :id AND t.status = 'PENDING'")
     int assignDriver(@Param("id") Long id, @Param("driverId") Long driverId, @Param("vehicleId") Long vehicleId);
+
+    @Query("SELECT COUNT(t) FROM Trip t WHERE t.status = :status AND t.price IS NOT NULL AND t.updatedAt >= :start AND t.updatedAt < :end")
+    long countCompletedWithPriceBetween(
+            @Param("status") TripStatus status,
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end);
+
+    @Query("SELECT AVG(t.price) FROM Trip t WHERE t.status = :status AND t.price IS NOT NULL AND t.updatedAt >= :start AND t.updatedAt < :end")
+    Double averagePriceCompletedBetween(
+            @Param("status") TripStatus status,
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end);
 }

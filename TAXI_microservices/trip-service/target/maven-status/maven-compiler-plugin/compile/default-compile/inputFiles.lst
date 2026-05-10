@@ -1,10 +1,12 @@
 D:\3semestr\taxi\TAXI_microservices\trip-service\src\main\java\com\taxi\trip\controller\TripController.java
+D:\3semestr\taxi\TAXI_microservices\trip-service\src\main\java\com\taxi\trip\service\TripStatsService.java
 D:\3semestr\taxi\TAXI_microservices\trip-service\src\main\java\com\taxi\trip\security\JwtAuthenticationFilter.java
 D:\3semestr\taxi\TAXI_microservices\trip-service\src\main\java\com\taxi\trip\TripServiceApplication.java
 D:\3semestr\taxi\TAXI_microservices\trip-service\src\main\java\com\taxi\trip\security\JwtTokenService.java
 D:\3semestr\taxi\TAXI_microservices\trip-service\src\main\java\com\taxi\trip\dto\TripResponseDto.java
 D:\3semestr\taxi\TAXI_microservices\trip-service\src\main\java\com\taxi\trip\client\UserServiceClient.java
 D:\3semestr\taxi\TAXI_microservices\trip-service\src\main\java\com\taxi\trip\client\VehicleServiceClient.java
+D:\3semestr\taxi\TAXI_microservices\trip-service\src\main\java\com\taxi\trip\dto\DailyTripStatsResponse.java
 D:\3semestr\taxi\TAXI_microservices\trip-service\src\main\java\com\taxi\trip\dto\UpdateTripStatusRequest.java
 D:\3semestr\taxi\TAXI_microservices\trip-service\src\main\java\com\taxi\trip\model\Trip.java
 D:\3semestr\taxi\TAXI_microservices\trip-service\src\main\java\com\taxi\trip\model\TripStatus.java
