@@ -1,0 +1,2 @@
+trip-service:
+  url: http://trip-service:8082

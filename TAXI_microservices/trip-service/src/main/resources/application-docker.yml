@@ -1,0 +1,8 @@
+user-service:
+  url: http://user-service:8081
+
+notification-service:
+  url: http://notification-service:8083
+
+vehicle-service:
+  url: http://vehicle-service:8084
