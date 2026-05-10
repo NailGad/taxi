@@ -1,3 +1,14 @@
+com/taxi/trip/dto/CreateTripRequest.class
+com/taxi/trip/dto/TripResponseDto.class
 com/taxi/trip/model/TripStatus.class
-com/taxi/trip/model/Trip.class
+com/taxi/trip/controller/TripController.class
+com/taxi/trip/config/WebClientConfig.class
+com/taxi/trip/dto/DriverDto.class
+com/taxi/trip/service/TripService.class
 com/taxi/trip/TripServiceApplication.class
+com/taxi/trip/exception/GlobalExceptionHandler.class
+com/taxi/trip/model/Trip.class
+com/taxi/trip/client/UserServiceClient.class
+com/taxi/trip/repository/TripRepository.class
+com/taxi/trip/dto/UpdateTripStatusRequest.class
+com/taxi/trip/service/TripService$1.class
