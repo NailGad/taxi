@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: trip-service
+
+  datasource:
+    url: jdbc:h2:mem:trip_db;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+server:
+  port: 8082
+
+user-service:
+  url: http://localhost:8081
+
+notification-service:
+  url: http://localhost:8083
+
+logging:
+  level:
+    com.taxi: DEBUG

@@ -1,0 +1,13 @@
+/home/komal-tyt/Desktop/3 semestr/taxi/TAXI_microservices/trip-service/src/main/java/com/taxi/trip/client/UserServiceClient.java
+/home/komal-tyt/Desktop/3 semestr/taxi/TAXI_microservices/trip-service/src/main/java/com/taxi/trip/service/TripService.java
+/home/komal-tyt/Desktop/3 semestr/taxi/TAXI_microservices/trip-service/src/main/java/com/taxi/trip/dto/CreateTripRequest.java
+/home/komal-tyt/Desktop/3 semestr/taxi/TAXI_microservices/trip-service/src/main/java/com/taxi/trip/dto/TripResponseDto.java
+/home/komal-tyt/Desktop/3 semestr/taxi/TAXI_microservices/trip-service/src/main/java/com/taxi/trip/model/Trip.java
+/home/komal-tyt/Desktop/3 semestr/taxi/TAXI_microservices/trip-service/src/main/java/com/taxi/trip/dto/UpdateTripStatusRequest.java
+/home/komal-tyt/Desktop/3 semestr/taxi/TAXI_microservices/trip-service/src/main/java/com/taxi/trip/dto/DriverDto.java
+/home/komal-tyt/Desktop/3 semestr/taxi/TAXI_microservices/trip-service/src/main/java/com/taxi/trip/model/TripStatus.java
+/home/komal-tyt/Desktop/3 semestr/taxi/TAXI_microservices/trip-service/src/main/java/com/taxi/trip/controller/TripController.java
+/home/komal-tyt/Desktop/3 semestr/taxi/TAXI_microservices/trip-service/src/main/java/com/taxi/trip/exception/GlobalExceptionHandler.java
+/home/komal-tyt/Desktop/3 semestr/taxi/TAXI_microservices/trip-service/src/main/java/com/taxi/trip/config/WebClientConfig.java
+/home/komal-tyt/Desktop/3 semestr/taxi/TAXI_microservices/trip-service/src/main/java/com/taxi/trip/repository/TripRepository.java
+/home/komal-tyt/Desktop/3 semestr/taxi/TAXI_microservices/trip-service/src/main/java/com/taxi/trip/TripServiceApplication.java
