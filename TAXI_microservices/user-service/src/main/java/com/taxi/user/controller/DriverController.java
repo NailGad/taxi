@@ -2,7 +2,6 @@ package com.taxi.user.controller;
 
 import com.taxi.user.dto.DriverDto;
 import com.taxi.user.dto.DriverStatusUpdateDto;
-import com.taxi.user.model.Driver;
 import com.taxi.user.model.DriverStatus;
 import com.taxi.user.service.DriverService;
 import jakarta.validation.Valid;
@@ -12,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -47,13 +47,18 @@ public class DriverController {
     @GetMapping("/available")
     public ResponseEntity<DriverDto> findAvailableDriver() {
         log.info("GET /drivers/available - Finding available driver");
-        Optional<Driver> driver = driverService.findAvailableDriver();
-        if (driver.isPresent()) {
-            return ResponseEntity.ok(driverService.getDriver(driver.get().getId()));
-        } else {
-            log.warn("No available drivers found");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+        Optional<DriverDto> driver = driverService.findAvailableDriverDto();
+        return driver.map(ResponseEntity::ok)
+                .orElseGet(() -> {
+                    log.warn("No available drivers found");
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                });
+    }
+
+    @GetMapping("/available/list")
+    public ResponseEntity<List<DriverDto>> listAvailableDrivers() {
+        log.info("GET /drivers/available/list - Cached list of ONLINE drivers");
+        return ResponseEntity.ok(driverService.findAvailableDriversList());
     }
 
     @GetMapping("/{id}/exists")

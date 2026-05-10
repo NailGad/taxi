@@ -18,6 +18,8 @@ public interface DriverRepository extends JpaRepository<Driver, Long> {
 
     List<Driver> findByStatus(DriverStatus status);
 
+    List<Driver> findByStatusOrderByIdAsc(DriverStatus status);
+
     @Query("SELECT d FROM Driver d WHERE d.status = :status ORDER BY d.id ASC")
     Optional<Driver> findFirstByStatus(@Param("status") DriverStatus status);
 }

@@ -18,8 +18,21 @@ spring:
       enabled: true
       path: /h2-console
 
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: 2000ms
+
+  cache:
+    type: redis
+
 server:
   port: 8081
+
+taxi:
+  cache:
+    available-drivers-ttl-seconds: 30
 
 user-service:
   url: http://localhost:8081
