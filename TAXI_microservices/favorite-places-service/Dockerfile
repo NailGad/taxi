@@ -11,6 +11,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf 
 COPY --from=build /workspace/target/favorite-places-service-1.0.0.jar app.jar
 EXPOSE 8086
 ENV SPRING_PROFILES_ACTIVE=docker
-HEALTHCHECK --interval=15s --timeout=5s --start-period=50s --retries=8 \
-  CMD curl -sf "http://127.0.0.1:8086/favorites/999?userRole=PASSENGER"
+HEALTHCHECK --interval=10s --timeout=5s --start-period=120s --retries=12 \
+  CMD curl -sS http://127.0.0.1:8086/health | grep -q '^UP$' || exit 1
 ENTRYPOINT ["java","-jar","/app/app.jar"]

@@ -53,22 +53,21 @@ public class TripService {
     private void assignDriverToTrip(Trip trip) {
         log.info("Looking for available driver for trip: {}", trip.getId());
 
-        Optional<DriverDto> availableDriver = userServiceClient.findAvailableDriver();
+        Optional<DriverDto> claimed = userServiceClient.claimAvailableDriver();
 
-        if (availableDriver.isPresent()) {
-            DriverDto driver = availableDriver.get();
-            log.info("Found driver {} for trip {}", driver.getId(), trip.getId());
+        if (claimed.isPresent()) {
+            DriverDto driver = claimed.get();
+            log.info("Claimed driver {} for trip {}", driver.getId(), trip.getId());
 
             Long vehicleId = vehicleServiceClient.findTodayVehicleId(driver.getId()).orElse(null);
 
             int updated = tripRepository.assignDriver(trip.getId(), driver.getId(), vehicleId);
 
             if (updated > 0) {
-                // Обновляем статус водителя на BUSY
-                userServiceClient.updateDriverStatus(driver.getId(), "BUSY");
-                log.info("Driver {} assigned to trip {}", driver.getId(), trip.getId());
+                log.info("Driver {} assigned to trip {} (already BUSY from claim)", driver.getId(), trip.getId());
             } else {
-                log.warn("Trip {} was already assigned to another driver", trip.getId());
+                log.warn("Trip {} no longer PENDING; releasing claimed driver {}", trip.getId(), driver.getId());
+                userServiceClient.updateDriverStatus(driver.getId(), "ONLINE");
             }
         } else {
             log.warn("No available driver found for trip {}", trip.getId());

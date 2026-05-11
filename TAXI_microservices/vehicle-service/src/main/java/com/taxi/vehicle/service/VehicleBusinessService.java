@@ -100,10 +100,8 @@ public class VehicleBusinessService {
                 .orElseThrow(() -> new RuntimeException("Vehicle not found: " + vehicleId));
     }
 
-    public VehicleResponseDto getToday(Long driverId) {
-        Vehicle v = vehicleRepository.findByDriverIdAndActiveTodayTrue(driverId)
-                .orElseThrow(() -> new RuntimeException("Today vehicle not selected for driver: " + driverId));
-        return map(v);
+    public Optional<VehicleResponseDto> getToday(Long driverId) {
+        return vehicleRepository.findByDriverIdAndActiveTodayTrue(driverId).map(this::map);
     }
 
     public Optional<Long> findTodayVehicleId(Long driverId) {

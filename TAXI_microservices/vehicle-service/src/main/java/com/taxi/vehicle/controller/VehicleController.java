@@ -73,7 +73,9 @@ public class VehicleController {
         if (authorization != null && authorization.startsWith("Bearer ")) {
             assertDriver(driverId);
         }
-        return ResponseEntity.ok(vehicleBusinessService.getToday(driverId));
+        return vehicleBusinessService.getToday(driverId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     private void assertDriver(Long driverId) {

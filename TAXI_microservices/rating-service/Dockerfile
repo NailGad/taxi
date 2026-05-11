@@ -11,6 +11,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf 
 COPY --from=build /workspace/target/rating-service-1.0.0.jar app.jar
 EXPOSE 8085
 ENV SPRING_PROFILES_ACTIVE=docker
-HEALTHCHECK --interval=15s --timeout=5s --start-period=50s --retries=8 \
+HEALTHCHECK --interval=10s --timeout=5s --start-period=120s --retries=12 \
   CMD curl -sf http://127.0.0.1:8085/ratings/driver/999
 ENTRYPOINT ["java","-jar","/app/app.jar"]

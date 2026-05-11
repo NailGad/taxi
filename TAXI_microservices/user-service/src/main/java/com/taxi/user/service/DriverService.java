@@ -82,6 +82,24 @@ public class DriverService {
         return list.isEmpty() ? Optional.empty() : Optional.of(list.get(0));
     }
 
+    /**
+     * Atomically reserves the lowest-id ONLINE driver: row lock + transition to BUSY in one transaction.
+     * Trip-service should call this instead of GET /drivers/available + PATCH to avoid double-booking.
+     */
+    @Transactional
+    @CacheEvict(cacheNames = RedisCacheConfig.AVAILABLE_DRIVERS_CACHE, allEntries = true)
+    public Optional<DriverDto> claimAvailableDriver() {
+        Optional<Driver> opt = driverRepository.findFirstByStatusOrderByIdAscForUpdate(DriverStatus.ONLINE);
+        if (opt.isEmpty()) {
+            return Optional.empty();
+        }
+        Driver driver = opt.get();
+        driver.setStatus(DriverStatus.BUSY);
+        Driver saved = driverRepository.save(driver);
+        log.info("Claimed driver {} for trip assignment (ONLINE -> BUSY)", saved.getId());
+        return Optional.of(convertToDto(saved));
+    }
+
     public boolean existsDriver(Long id) {
         return driverRepository.existsById(id);
     }

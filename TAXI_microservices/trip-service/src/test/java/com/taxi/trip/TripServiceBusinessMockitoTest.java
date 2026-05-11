@@ -3,6 +3,7 @@ package com.taxi.trip;
 import com.taxi.trip.client.UserServiceClient;
 import com.taxi.trip.client.VehicleServiceClient;
 import com.taxi.trip.dto.CreateTripRequest;
+import com.taxi.trip.dto.DriverDto;
 import com.taxi.trip.model.Trip;
 import com.taxi.trip.model.TripStatus;
 import com.taxi.trip.repository.TripRepository;
@@ -19,6 +20,8 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -63,7 +66,7 @@ class TripServiceBusinessMockitoTest {
             t.setStatus(TripStatus.PENDING);
             return Optional.of(t);
         });
-        when(userServiceClient.findAvailableDriver()).thenReturn(Optional.empty());
+        when(userServiceClient.claimAvailableDriver()).thenReturn(Optional.empty());
 
         var dto = tripService.createTrip(new CreateTripRequest(1L, "A", "B"));
 
@@ -119,5 +122,62 @@ class TripServiceBusinessMockitoTest {
         assertThatThrownBy(() -> tripService.updateTripStatus(1L, TripStatus.IN_PROGRESS, 99L, null))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("not assigned");
+    }
+
+    @Test
+    void createTripAssignsDriverWhenClaimSucceeds() {
+        when(userServiceClient.checkPassengerExists(1L)).thenReturn(true);
+        when(tripRepository.save(any(Trip.class))).thenAnswer(inv -> {
+            Trip t = inv.getArgument(0);
+            t.setId(200L);
+            return t;
+        });
+        when(tripRepository.findById(200L)).thenAnswer(inv -> {
+            Trip t = new Trip();
+            t.setId(200L);
+            t.setPassengerId(1L);
+            t.setOrigin("A");
+            t.setDestination("B");
+            t.setStatus(TripStatus.ACCEPTED);
+            t.setDriverId(3L);
+            return Optional.of(t);
+        });
+        DriverDto driver = new DriverDto(3L, "D", "d@e.com", "+1234567890", "LIC", "BUSY");
+        when(userServiceClient.claimAvailableDriver()).thenReturn(Optional.of(driver));
+        when(vehicleServiceClient.findTodayVehicleId(3L)).thenReturn(Optional.of(10L));
+        when(tripRepository.assignDriver(200L, 3L, 10L)).thenReturn(1);
+
+        var dto = tripService.createTrip(new CreateTripRequest(1L, "A", "B"));
+
+        assertThat(dto.getDriverId()).isEqualTo(3L);
+        assertThat(dto.getStatus()).isEqualTo(TripStatus.ACCEPTED);
+        verify(tripRepository).assignDriver(200L, 3L, 10L);
+        verify(userServiceClient, never()).updateDriverStatus(eq(3L), eq("BUSY"));
+    }
+
+    @Test
+    void createTripReleasesDriverWhenAssignFailsAfterClaim() {
+        when(userServiceClient.checkPassengerExists(1L)).thenReturn(true);
+        when(tripRepository.save(any(Trip.class))).thenAnswer(inv -> {
+            Trip t = inv.getArgument(0);
+            t.setId(201L);
+            return t;
+        });
+        Trip pendingOut = new Trip();
+        pendingOut.setId(201L);
+        pendingOut.setPassengerId(1L);
+        pendingOut.setOrigin("A");
+        pendingOut.setDestination("B");
+        pendingOut.setStatus(TripStatus.PENDING);
+        when(tripRepository.findById(201L)).thenReturn(Optional.of(pendingOut));
+        DriverDto driver = new DriverDto(4L, "D", "d2@e.com", "+1234567891", "LIC2", "BUSY");
+        when(userServiceClient.claimAvailableDriver()).thenReturn(Optional.of(driver));
+        when(vehicleServiceClient.findTodayVehicleId(4L)).thenReturn(Optional.empty());
+        when(tripRepository.assignDriver(201L, 4L, null)).thenReturn(0);
+
+        var dto = tripService.createTrip(new CreateTripRequest(1L, "A", "B"));
+
+        assertThat(dto.getStatus()).isEqualTo(TripStatus.PENDING);
+        verify(userServiceClient).updateDriverStatus(4L, "ONLINE");
     }
 }

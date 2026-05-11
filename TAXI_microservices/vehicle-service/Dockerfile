@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf 
 COPY --from=build /workspace/target/vehicle-service-1.0.0.jar app.jar
 EXPOSE 8084
 ENV SPRING_PROFILES_ACTIVE=docker
-HEALTHCHECK --interval=15s --timeout=5s --start-period=50s --retries=8 \
-  CMD curl -sf http://127.0.0.1:8084/vehicles/driver/999
+# Do not use /vehicles/driver/*/today here: without data it returns 404 and breaks checks that use curl -f.
+HEALTHCHECK --interval=10s --timeout=5s --start-period=120s --retries=12 \
+  CMD curl -sS http://127.0.0.1:8084/health | grep -q '^UP$' || exit 1
 ENTRYPOINT ["java","-jar","/app/app.jar"]

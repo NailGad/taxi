@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
@@ -53,6 +54,26 @@ public class UserServiceClient {
             return Optional.empty();
         } catch (Exception e) {
             log.error("Error finding available driver: {}", e.getMessage());
+            return Optional.empty();
+        }
+    }
+
+    public Optional<DriverDto> claimAvailableDriver() {
+        try {
+            log.debug("Claiming available driver via user-service");
+            DriverDto driver = webClientBuilder.build()
+                    .post()
+                    .uri(userServiceUrl + "/drivers/claim-available")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .bodyToMono(DriverDto.class)
+                    .block();
+            return Optional.ofNullable(driver);
+        } catch (WebClientResponseException.NotFound e) {
+            log.warn("No driver available to claim");
+            return Optional.empty();
+        } catch (Exception e) {
+            log.error("Error claiming available driver: {}", e.getMessage());
             return Optional.empty();
         }
     }

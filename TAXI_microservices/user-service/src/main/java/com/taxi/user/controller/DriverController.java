@@ -52,6 +52,14 @@ public class DriverController {
                 });
     }
 
+    @PostMapping("/claim-available")
+    public ResponseEntity<DriverDto> claimAvailableDriver() {
+        log.info("POST /drivers/claim-available - Atomically claiming next ONLINE driver");
+        return driverService.claimAvailableDriver()
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    }
+
     @GetMapping("/available/list")
     public ResponseEntity<List<DriverDto>> listAvailableDrivers() {
         log.info("GET /drivers/available/list - Cached list of ONLINE drivers");
